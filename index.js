@@ -1,3 +1,5 @@
+// golden response ------------------------------------------------------------------------------------------------------------------
+
 /**
  * HEP-js: A simple HEP3 Library for Node.JS
  *
@@ -40,27 +42,27 @@ module.exports = {
   decapsulate: function(message) {
     if (debug) console.log('Decoding HEP3 Packet...');
     try {
-	var HEP = hepHeader.parse(message);
-	if(HEP.payload && HEP.payload.length>0){
-	  var data = HEP.payload;
-	  var tot = 0;
-	  var decoded = {};
-	  var PAYLOAD;
-	  while(true){
-	    PAYLOAD = hepParse.parse( data.slice(tot) );
-	    var tmp = hepDecode(PAYLOAD);
-	    decoded = mixinDeep(decoded, tmp);
-	    tot += PAYLOAD.length;
-	    if(tot>=HEP.payload.length) { break; }
-	  }
-	  if(debug) console.log(decoded);
-	  return decoded;
-	}
+      var HEP = hepHeader.parse(message);
+      if(HEP.payload && HEP.payload.length>0){
+        var data = HEP.payload;
+        var tot = 0;
+        var decoded = {};
+        var PAYLOAD;
+        while(true){
+          PAYLOAD = hepParse.parse( data.slice(tot) );
+          var tmp = hepDecode(PAYLOAD);
+          decoded = mixinDeep(decoded, tmp);
+          tot += PAYLOAD.length;
+          if(tot>=HEP.payload.length) { break; }
+        }
+        if(debug) console.log(decoded);
+        return decoded;
+      }
     } catch(e) {
-	return false;
+      return false;
     }
-
   },
+
   /**
    * Encode HEP3 Packet from JSON Object.
    *
@@ -69,277 +71,277 @@ module.exports = {
    * @return {Buffer} hep message
    */
   encapsulate: function(msg,rcinfo) {
-	if (debug) console.log('Sending HEP3 Packet...');
-	var header = Buffer.allocUnsafe(6);
-	header.write ("HEP3");
+    if (debug) console.log('Sending HEP3 Packet...');
+    var header = Buffer.allocUnsafe(6);
+    header.write ("HEP3");
 
-	var ip_family = Buffer.allocUnsafe(7);
-	ip_family.writeUInt16BE(0x0000, 0);
-	ip_family.writeUInt16BE(0x0001,2);
-	ip_family.writeUInt8(rcinfo.protocolFamily,6);
-	ip_family.writeUInt16BE(ip_family.length,4);
+    var ip_family = Buffer.allocUnsafe(7);
+    ip_family.writeUInt16BE(0x0000, 0);
+    ip_family.writeUInt16BE(0x0001,2);
+    ip_family.writeUInt8(rcinfo.protocolFamily,6);
+    ip_family.writeUInt16BE(ip_family.length,4);
 
-	var ip_proto = Buffer.allocUnsafe(7);
-	ip_proto.writeUInt16BE(0x0000, 0);
-	ip_proto.writeUInt16BE(0x0002, 2);
-	ip_proto.writeUInt8(rcinfo.protocol,6);
-	ip_proto.writeUInt16BE(ip_proto.length,4);
+    var ip_proto = Buffer.allocUnsafe(7);
+    ip_proto.writeUInt16BE(0x0000, 0);
+    ip_proto.writeUInt16BE(0x0002, 2);
+    ip_proto.writeUInt8(rcinfo.protocol,6);
+    ip_proto.writeUInt16BE(ip_proto.length,4);
 
-	/*ip*/
-	var d = rcinfo.srcIp ? rcinfo.srcIp.split('.') : ['127','0','0','1'];
-	var tmpip = ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
+    /*ip*/
+    var d = rcinfo.srcIp ? rcinfo.srcIp.split('.') : ['127','0','0','1'];
+    var tmpip = ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 
-	var src_ip4 = Buffer.allocUnsafe(10);
-	src_ip4.writeUInt16BE(0x0000, 0);
-	src_ip4.writeUInt16BE(0x0003, 2);
-	src_ip4.writeUInt32BE(tmpip,6);
-	src_ip4.writeUInt16BE(src_ip4.length,4);
+    var src_ip4 = Buffer.allocUnsafe(10);
+    src_ip4.writeUInt16BE(0x0000, 0);
+    src_ip4.writeUInt16BE(0x0003, 2);
+    src_ip4.writeUInt32BE(tmpip,6);
+    src_ip4.writeUInt16BE(src_ip4.length,4);
 
-	d = rcinfo.dstIp ? rcinfo.dstIp.split('.') : ['127','0','0','1'];
-	tmpip = ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
+    d = rcinfo.dstIp ? rcinfo.dstIp.split('.') : ['127','0','0','1'];
+    tmpip = ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 
-	var dst_ip4 = Buffer.allocUnsafe(10);
-	dst_ip4.writeUInt16BE(0x0000, 0);
-	dst_ip4.writeUInt16BE(0x0004, 2);
-	dst_ip4.writeUInt32BE(tmpip,6);
-	dst_ip4.writeUInt16BE(dst_ip4.length,4);
+    var dst_ip4 = Buffer.allocUnsafe(10);
+    dst_ip4.writeUInt16BE(0x0000, 0);
+    dst_ip4.writeUInt16BE(0x0004, 2);
+    dst_ip4.writeUInt32BE(tmpip,6);
+    dst_ip4.writeUInt16BE(dst_ip4.length,4);
 
-	var src_port = Buffer.allocUnsafe(8);
-	var tmpA = rcinfo.srcPort ? parseInt(rcinfo.srcPort,10) : 0;
-	src_port.writeUInt16BE(0x0000, 0);
-	src_port.writeUInt16BE(0x0007, 2);
-	src_port.writeUInt16BE(tmpA,6);
-	src_port.writeUInt16BE(src_port.length,4);
+    var src_port = Buffer.allocUnsafe(8);
+    var tmpA = rcinfo.srcPort ? parseInt(rcinfo.srcPort,10) : 0;
+    src_port.writeUInt16BE(0x0000, 0);
+    src_port.writeUInt16BE(0x0007, 2);
+    src_port.writeUInt16BE(tmpA,6);
+    src_port.writeUInt16BE(src_port.length,4);
 
-	var dst_port = Buffer.allocUnsafe(8);
-	tmpA = rcinfo.dstPort ? parseInt(rcinfo.dstPort, 10) : 0;
-	dst_port.writeUInt16BE(0x0000, 0);
-	dst_port.writeUInt16BE(0x0008, 2);
-	dst_port.writeUInt16BE(tmpA,6);
-	dst_port.writeUInt16BE(dst_port.length,4);
+    var dst_port = Buffer.allocUnsafe(8);
+    tmpA = rcinfo.dstPort ? parseInt(rcinfo.dstPort, 10) : 0;
+    dst_port.writeUInt16BE(0x0000, 0);
+    dst_port.writeUInt16BE(0x0008, 2);
+    dst_port.writeUInt16BE(tmpA,6);
+    dst_port.writeUInt16BE(dst_port.length,4);
 
-	tmpA = ToUint32(rcinfo.timeSeconds);
-	var time_sec = Buffer.allocUnsafe(10);
-	time_sec.writeUInt16BE(0x0000, 0);
-	time_sec.writeUInt16BE(0x0009, 2);
-	time_sec.writeUInt32BE(tmpA,6);
-	time_sec.writeUInt16BE(time_sec.length,4);
+    tmpA = ToUint32(rcinfo.timeSeconds);
+    var time_sec = Buffer.allocUnsafe(10);
+    time_sec.writeUInt16BE(0x0000, 0);
+    time_sec.writeUInt16BE(0x0009, 2);
+    time_sec.writeUInt32BE(tmpA,6);
+    time_sec.writeUInt16BE(time_sec.length,4);
 
-	tmpA = ToUint32(rcinfo.timeUseconds);
-	var time_usec = Buffer.allocUnsafe(10);
-	time_usec.writeUInt16BE(0x0000, 0);
-	time_usec.writeUInt16BE(0x000a, 2);
-	time_usec.writeUInt32BE(tmpA,6);
-	time_usec.writeUInt16BE(time_usec.length,4);
+    tmpA = ToUint32(rcinfo.timeUseconds);
+    var time_usec = Buffer.allocUnsafe(10);
+    time_usec.writeUInt16BE(0x0000, 0);
+    time_usec.writeUInt16BE(0x000a, 2);
+    time_usec.writeUInt32BE(tmpA,6);
+    time_usec.writeUInt16BE(time_usec.length,4);
 
-	var proto_type = Buffer.allocUnsafe(7);
-	proto_type.writeUInt16BE(0x0000, 0);
-	proto_type.writeUInt16BE(0x000b,2);
-	proto_type.writeUInt8(rcinfo.payloadType,6);
-	proto_type.writeUInt16BE(proto_type.length,4);
+    var proto_type = Buffer.allocUnsafe(7);
+    proto_type.writeUInt16BE(0x0000, 0);
+    proto_type.writeUInt16BE(0x000b,2);
+    proto_type.writeUInt8(rcinfo.payloadType,6);
+    proto_type.writeUInt16BE(proto_type.length,4);
 
-	tmpA = ToUint32(rcinfo.captureId);
-	var capt_id = Buffer.allocUnsafe(10);
-	capt_id.writeUInt16BE(0x0000, 0);
-	capt_id.writeUInt16BE(0x000c, 2);
-	capt_id.writeUInt32BE(tmpA,6);
-	capt_id.writeUInt16BE(capt_id.length,4);
-	  
-	// HEPNodeName w/ Fallback to HEP Capture ID
-	tmpA = rcinfo.hepNodeName ? rcinfo.hepNodeName : "" + rcinfo.captureId;
-	var hepnodename_chunk = Buffer.allocUnsafe(6 + tmpA.length);
-	hepnodename_chunk.writeUInt16BE(0x0000, 0);
-	hepnodename_chunk.writeUInt16BE(0x0013, 2);
-	hepnodename_chunk.write(tmpA,6, tmpA.length);
-	hepnodename_chunk.writeUInt16BE(hepnodename_chunk.length,4);
+    tmpA = ToUint32(rcinfo.captureId);
+    var capt_id = Buffer.allocUnsafe(10);
+    capt_id.writeUInt16BE(0x0000, 0);
+    capt_id.writeUInt16BE(0x000c, 2);
+    capt_id.writeUInt32BE(tmpA,6);
+    capt_id.writeUInt16BE(capt_id.length,4);
+      
+    // HEPNodeName w/ Fallback to HEP Capture ID
+    tmpA = rcinfo.hepNodeName ? rcinfo.hepNodeName : "" + rcinfo.captureId;
+    var hepnodename_chunk = Buffer.allocUnsafe(6 + tmpA.length);
+    hepnodename_chunk.writeUInt16BE(0x0000, 0);
+    hepnodename_chunk.writeUInt16BE(0x0013, 2);
+    hepnodename_chunk.write(tmpA,6, tmpA.length);
+    hepnodename_chunk.writeUInt16BE(hepnodename_chunk.length,4);
 
-	var auth_chunk;
-	if(typeof rcinfo.capturePass === 'string') {
-	  auth_chunk = Buffer.allocUnsafe(6 + rcinfo.capturePass.length);
-	  auth_chunk.writeUInt16BE(0x0000, 0);
-	  auth_chunk.writeUInt16BE(0x000e, 2);
-	  auth_chunk.write(rcinfo.capturePass,6, rcinfo.capturePass.length);
-	  auth_chunk.writeUInt16BE(auth_chunk.length,4);
-	}
-	else {
-	  auth_chunk = Buffer.allocUnsafe(0);
-	}
+    var auth_chunk;
+    if(typeof rcinfo.capturePass === 'string') {
+      auth_chunk = Buffer.allocUnsafe(6 + rcinfo.capturePass.length);
+      auth_chunk.writeUInt16BE(0x0000, 0);
+      auth_chunk.writeUInt16BE(0x000e, 2);
+      auth_chunk.write(rcinfo.capturePass,6, rcinfo.capturePass.length);
+      auth_chunk.writeUInt16BE(auth_chunk.length,4);
+    }
+    else {
+      auth_chunk = Buffer.allocUnsafe(0);
+    }
 
-	var payload_chunk = Buffer.allocUnsafe(6 + msg.length);
-	payload_chunk.writeUInt16BE(0x0000, 0);
-	payload_chunk.writeUInt16BE(0x000f, 2);
-	payload_chunk.write(msg, 6, msg.length);
-	payload_chunk.writeUInt16BE(payload_chunk.length,4);
+    var payload_chunk = Buffer.allocUnsafe(6 + msg.length);
+    payload_chunk.writeUInt16BE(0x0000, 0);
+    payload_chunk.writeUInt16BE(0x000f, 2);
+    payload_chunk.write(msg, 6, msg.length);
+    payload_chunk.writeUInt16BE(payload_chunk.length,4);
 
-	var extensions_chunk = Buffer.allocUnsafe(0);
-	for(var i in extensions) {
-	  for(var j in extensions[i]) {
-	    var extdef = extensions[i][j];
-	    if(typeof extdef === "object" &&
-	       typeof extdef.keyName === "string" &&
-	       typeof rcinfo[extdef.keyName] !== 'undefined') {
-		var this_chunk;
-		var data = rcinfo[extdef.keyName];
-		var failed = true;
-		if(/\d{1,}/.test(extdef.type)) {
-		  var bitLength = extdef.type.match(/\d{1,}/)[0];
-		  var size = Math.floor(bitLength/8)+6;
-		  this_chunk = Buffer.allocUnsafe(size);
-		  this_chunk.writeUInt16BE(i, 0);
-		  this_chunk.writeUInt16BE(j, 2);
-		  if(typeof this_chunk["write"+extdef.type] === 'function') {
-		    this_chunk['write'+extdef.type](data ,6);
-		    failed = false;
-		  }
-		  else if(typeof this_chunk["write"+extdef.type+"BE"] === 'function') {
-		    this_chunk['write'+extdef.type+"BE"](data ,6);
-		    failed = false;
-		  }
-		  this_chunk.writeUInt16BE(this_chunk.length,4);
-		}
-		else if(/string$/.test(extdef.type) || extdef.type === undefined) {
-		  this_chunk = Buffer.allocUnsafe(6+data.length);
-		  this_chunk.writeUInt16BE(i, 0);
-		  this_chunk.writeUInt16BE(j, 2);
-		  this_chunk.write(data, 6, data.length);
-		  this_chunk.writeUInt16BE(this_chunk.length, 4);
-		  failed = false;
-		}
-		if(typeof this_chunk !== 'undefined' && !failed) {
-		  extensions_chunk = Buffer.concat([extensions_chunk, this_chunk]);
-		}
-	    }
-	  }
-	}
+    var extensions_chunk = Buffer.allocUnsafe(0);
+    for(var i in extensions) {
+      for(var j in extensions[i]) {
+        var extdef = extensions[i][j];
+        if(typeof extdef === "object" &&
+           typeof extdef.keyName === "string" &&
+           typeof rcinfo[extdef.keyName] !== 'undefined') {
+          var this_chunk;
+          var data = rcinfo[extdef.keyName];
+          var failed = true;
+          if(/\d{1,}/.test(extdef.type)) {
+            var bitLength = extdef.type.match(/\d{1,}/)[0];
+            var size = Math.floor(bitLength/8)+6;
+            this_chunk = Buffer.allocUnsafe(size);
+            this_chunk.writeUInt16BE(i, 0);
+            this_chunk.writeUInt16BE(j, 2);
+            if(typeof this_chunk["write"+extdef.type] === 'function') {
+              this_chunk['write'+extdef.type](data ,6);
+              failed = false;
+            }
+            else if(typeof this_chunk["write"+extdef.type+"BE"] === 'function') {
+              this_chunk['write'+extdef.type+"BE"](data ,6);
+              failed = false;
+            }
+            this_chunk.writeUInt16BE(this_chunk.length,4);
+          }
+          else if(/string$/.test(extdef.type) || extdef.type === undefined) {
+            this_chunk = Buffer.allocUnsafe(6+data.length);
+            this_chunk.writeUInt16BE(i, 0);
+            this_chunk.writeUInt16BE(j, 2);
+            this_chunk.write(data, 6, data.length);
+            this_chunk.writeUInt16BE(this_chunk.length, 4);
+            failed = false;
+          }
+          if(typeof this_chunk !== 'undefined' && !failed) {
+            extensions_chunk = Buffer.concat([extensions_chunk, this_chunk]);
+          }
+        }
+      }
+    }
 
-	var hep_message, correlation_chunk;
+    var hep_message, correlation_chunk;
 
-	if ((rcinfo.proto_type == 32 || rcinfo.proto_type == 35 ) && rcinfo.correlation_id.length) {
+    if ((rcinfo.proto_type == 32 || rcinfo.proto_type == 35 ) && rcinfo.correlation_id.length) {
 
-		// create correlation chunk
-	        correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(0x0000, 0);
-	        correlation_chunk.writeUInt16BE(0x0011, 2);
-	        correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
+      // create correlation chunk
+      correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(0x0000, 0);
+      correlation_chunk.writeUInt16BE(0x0011, 2);
+      correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
 
-	        tmpA = ToUint16(rcinfo.mos);
-		var mos = Buffer.allocUnsafe(8);
-		mos.writeUInt16BE(0x0000, 0);
-		mos.writeUInt16BE(0x0020, 2);
-		mos.writeUInt16BE(tmpA,6);
-		mos.writeUInt16BE(mos.length,4);
+      tmpA = ToUint16(rcinfo.mos);
+      var mos = Buffer.allocUnsafe(8);
+      mos.writeUInt16BE(0x0000, 0);
+      mos.writeUInt16BE(0x0020, 2);
+      mos.writeUInt16BE(tmpA,6);
+      mos.writeUInt16BE(mos.length,4);
 
-		hep_message = Buffer.concat([
-			header, 
-			ip_family,
-			ip_proto,
-			src_ip4,
-			dst_ip4,
-			src_port,
-			dst_port,
-			time_sec,
-			time_usec,
-			proto_type,
-			capt_id,
-			hepnodename_chunk,
-			auth_chunk,
-			correlation_chunk,
-			mos,
-			payload_chunk,
-			extensions_chunk
-		]);
+      hep_message = Buffer.concat([
+        header, 
+        ip_family,
+        ip_proto,
+        src_ip4,
+        dst_ip4,
+        src_port,
+        dst_port,
+        time_sec,
+        time_usec,
+        proto_type,
+        capt_id,
+        hepnodename_chunk,
+        auth_chunk,
+        correlation_chunk,
+        mos,
+        payload_chunk,
+        extensions_chunk
+      ]);
 
-	}
-	// HEP TYPE 101 w/ mandatory json_chunk (string)
-	else if (rcinfo.transaction_type && rcinfo.transaction_type.length && rcinfo.correlation_id.length) {
+    }
+    // HEP TYPE 101 w/ mandatory json_chunk (string)
+    else if (rcinfo.transaction_type && rcinfo.transaction_type.length && rcinfo.correlation_id.length) {
 
-		// create correlation chunk
-	        correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(0x0000, 0);
-	        correlation_chunk.writeUInt16BE(0x0011, 2);
-	        correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
+      // create correlation chunk
+      correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(0x0000, 0);
+      correlation_chunk.writeUInt16BE(0x0011, 2);
+      correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
 
-	        // create transaction_type chunk
-	        var transaction_type = Buffer.allocUnsafe(6 + rcinfo.transaction_type.length);
-	        transaction_type.writeUInt16BE(0x0000, 0);
-	        transaction_type.writeUInt16BE(0x0024, 2);
-	        transaction_type.write(rcinfo.transaction_type,6, rcinfo.transaction_type.length);
-	        transaction_type.writeUInt16BE(transaction_type.length,4);
+      // create transaction_type chunk
+      var transaction_type = Buffer.allocUnsafe(6 + rcinfo.transaction_type.length);
+      transaction_type.writeUInt16BE(0x0000, 0);
+      transaction_type.writeUInt16BE(0x0024, 2);
+      transaction_type.write(rcinfo.transaction_type,6, rcinfo.transaction_type.length);
+      transaction_type.writeUInt16BE(transaction_type.length,4);
 
-		hep_message = Buffer.concat([
-			header, 
-			ip_family,
-			ip_proto,
-			src_ip4,
-			dst_ip4,
-			src_port,
-			dst_port,
-			time_sec,
-			time_usec,
-			proto_type,
-			capt_id,
-			hepnodename_chunk,
-			auth_chunk,
-			correlation_chunk,
-			transaction_type,
-			payload_chunk,
-			extensions_chunk
-		]);
+      hep_message = Buffer.concat([
+        header, 
+        ip_family,
+        ip_proto,
+        src_ip4,
+        dst_ip4,
+        src_port,
+        dst_port,
+        time_sec,
+        time_usec,
+        proto_type,
+        capt_id,
+        hepnodename_chunk,
+        auth_chunk,
+        correlation_chunk,
+        transaction_type,
+        payload_chunk,
+        extensions_chunk
+      ]);
 
-	}
-	else if (rcinfo.correlation_id && rcinfo.correlation_id.length) {
+    }
+    else if (rcinfo.correlation_id && rcinfo.correlation_id.length) {
 
-		// create correlation chunk
-	        correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(0x0000, 0);
-	        correlation_chunk.writeUInt16BE(0x0011, 2);
-	        correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
-	        correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
-		
-		hep_message = Buffer.concat([
-			header, 
-			ip_family,
-			ip_proto,
-			src_ip4,
-			dst_ip4,
-			src_port,
-			dst_port,
-			time_sec,
-			time_usec,
-			proto_type,
-			capt_id,
-			hepnodename_chunk,
-			auth_chunk,
-			correlation_chunk,
-			payload_chunk,
-			extensions_chunk
-		]);
-	}
-	else {
+      // create correlation chunk
+      correlation_chunk = Buffer.allocUnsafe(6 + rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(0x0000, 0);
+      correlation_chunk.writeUInt16BE(0x0011, 2);
+      correlation_chunk.write(rcinfo.correlation_id,6, rcinfo.correlation_id.length);
+      correlation_chunk.writeUInt16BE(correlation_chunk.length,4);
+      
+      hep_message = Buffer.concat([
+        header, 
+        ip_family,
+        ip_proto,
+        src_ip4,
+        dst_ip4,
+        src_port,
+        dst_port,
+        time_sec,
+        time_usec,
+        proto_type,
+        capt_id,
+        hepnodename_chunk,
+        auth_chunk,
+        correlation_chunk,
+        payload_chunk,
+		extensions_chunk
+      ]);
+    }
+    else {
 
-		hep_message = Buffer.concat([
-			header,
-			ip_family,
-			ip_proto,
-			src_ip4,
-			dst_ip4,
-			src_port,
-			dst_port,
-			time_sec,
-			time_usec,
-			proto_type,
-			capt_id,
-			hepnodename_chunk,
-			auth_chunk,
-			payload_chunk,
-			extensions_chunk
-		]);
+      hep_message = Buffer.concat([
+        header,
+        ip_family,
+        ip_proto,
+        src_ip4,
+        dst_ip4,
+        src_port,
+        dst_port,
+        time_sec,
+        time_usec,
+        proto_type,
+        capt_id,
+        hepnodename_chunk,
+        auth_chunk,
+        payload_chunk,
+        extensions_chunk
+      ]);
 
-	}
-	hep_message.writeUInt16BE(hep_message.length, 4);
-	return hep_message;
+    }
+    hep_message.writeUInt16BE(hep_message.length, 4);
+    return hep_message;
 
   },
 
@@ -351,6 +353,53 @@ module.exports = {
   decode: function(hep) {
     return String(hep)
       .toString('utf8');
+  },
+
+  /**
+   * Validate HEP packet structure
+   * @param {Object} packet - Decoded HEP packet
+   * @return {Boolean} - True if valid, false otherwise
+   */
+  validateHepPacket: function(packet) {
+    if (!packet || typeof packet !== 'object') return false;
+    if (!packet.rcinfo || typeof packet.rcinfo !== 'object') return false;
+    
+    const requiredFields = [
+      'protocolFamily', 'protocol', 'srcIp', 'dstIp', 'srcPort', 'dstPort',
+      'timeSeconds', 'timeUseconds', 'payloadType', 'captureId'
+    ];
+    
+    for (const field of requiredFields) {
+      if (typeof packet.rcinfo[field] === 'undefined') return false;
+    }
+    
+    if (typeof packet.payload === 'undefined') return false;
+    
+    return true;
+  },
+
+  /**
+   * Extract specific fields from a decoded HEP packet
+   * @param {Object} packet - Decoded HEP packet
+   * @param {Array} fields - Array of field names to extract
+   * @return {Object} - Object containing extracted fields
+   */
+  extractFields: function(packet, fields) {
+    if (!this.validateHepPacket(packet)) {
+      throw new Error('Invalid HEP packet');
+    }
+    
+    const result = {};
+    
+    for (const field of fields) {
+      if (field in packet.rcinfo) {
+        result[field] = packet.rcinfo[field];
+      } else if (field === 'payload') {
+        result.payload = packet.payload;
+      }
+    }
+    
+    return result;
   },
 
   addVendorExtensions: function(json) {
@@ -454,58 +503,58 @@ var hepIps = new Parser()
 var hepDecode = function(data){
   switch(data.type) {
     case 1:
-	return { rcinfo: { protocolFamily: data.chunk.readUInt8() } };
+      return { rcinfo: { protocolFamily: data.chunk.readUInt8() } };
     case 2:
-	return { rcinfo: { protocol: data.chunk.readUInt8() } };
+      return { rcinfo: { protocol: data.chunk.readUInt8() } };
     case 3:
-	return { rcinfo: { srcIp: hepIps.parse(data.chunk).ip.join('.') } };
+      return { rcinfo: { srcIp: hepIps.parse(data.chunk).ip.join('.') } };
     case 4:
-	return { rcinfo: { dstIp: hepIps.parse(data.chunk).ip.join('.') } };
+      return { rcinfo: { dstIp: hepIps.parse(data.chunk).ip.join('.') } };
     case 7:
-	return { rcinfo: { srcPort: data.chunk.readUInt16BE() } };
+      return { rcinfo: { srcPort: data.chunk.readUInt16BE() } };
     case 8:
-	return { rcinfo: { dstPort: data.chunk.readUInt16BE() } };
+      return { rcinfo: { dstPort: data.chunk.readUInt16BE() } };
     case 9:
-	return { rcinfo: { timeSeconds: data.chunk.readUInt32BE() } };
+      return { rcinfo: { timeSeconds: data.chunk.readUInt32BE() } };
     case 10:
-	return { rcinfo: { timeUseconds: data.chunk.readUInt32BE() } };
+      return { rcinfo: { timeUseconds: data.chunk.readUInt32BE() } };
     case 11:
-	return { rcinfo: { payloadType: data.chunk.readUInt8() } };
+      return { rcinfo: { payloadType: data.chunk.readUInt8() } };
     case 12:
-	return { rcinfo: { captureId: data.chunk.readUInt32BE() } };
+      return { rcinfo: { captureId: data.chunk.readUInt32BE() } };
     case 14:
-	return { rcinfo: { capturePass: data.chunk.toString() } };
+      return { rcinfo: { capturePass: data.chunk.toString() } };
     case 15:
-	return { payload: data.chunk.toString() };
+      return { payload: data.chunk.toString() };
     case 17:
-        return { rcinfo: { correlation_id: data.chunk.toString() } };
+      return { rcinfo: { correlation_id: data.chunk.toString() } };
     case 19:
-	return { rcinfo: { hepNodeName: data.chunk.toString() } };
+      return { rcinfo: { hepNodeName: data.chunk.toString() } };
     case 32:
-	return { rcinfo: { mos: data.chunk.readUInt16BE() } };
+      return { rcinfo: { mos: data.chunk.readUInt16BE() } };
     case 36:
-	return { rcinfo: { transaction_type: data.chunk.readUInt16BE() } };
+      return { rcinfo: { transaction_type: data.chunk.readUInt16BE() } };
     default:
-	var returnData = {};
-	if(typeof extensions[data.vendor] === 'object' &&
-	   typeof extensions[data.vendor][data.type] === 'object' &&
-	   typeof extensions[data.vendor][data.type].keyName) {
-	    returnData.rcinfo = {};
-	    var keyName = extensions[data.vendor][data.type].keyName;
-	    var type = extensions[data.vendor][data.type].type;
-	    if(typeof type === 'string') {
-	      if(typeof data.chunk['read'+type] === 'function') {
-		returnData.rcinfo[keyName] = data.chunk['read'+type]();
-	      }
-	      else if(typeof data.chunk['read'+type+"BE"] === 'function') {
-		returnData.rcinfo[keyName] = data.chunk['read'+type+"BE"]();
-	      }
-	    }
-	    else {
-	      returnData.rcinfo[keyName] = data.chunk.toString();
-	    }
-	}
-	return returnData;
+      var returnData = {};
+      if(typeof extensions[data.vendor] === 'object' &&
+         typeof extensions[data.vendor][data.type] === 'object' &&
+         typeof extensions[data.vendor][data.type].keyName) {
+          returnData.rcinfo = {};
+          var keyName = extensions[data.vendor][data.type].keyName;
+          var type = extensions[data.vendor][data.type].type;
+          if(typeof type === 'string') {
+            if(typeof data.chunk['read'+type] === 'function') {
+              returnData.rcinfo[keyName] = data.chunk['read'+type]();
+            }
+            else if(typeof data.chunk['read'+type+"BE"] === 'function') {
+              returnData.rcinfo[keyName] = data.chunk['read'+type+"BE"]();
+            }
+          }
+          else {
+            returnData.rcinfo[keyName] = data.chunk.toString();
+          }
+      }
+      return returnData;
   }
 };
 
@@ -521,33 +570,3 @@ function deepMerge(o1,o2) {
  }
  return o1;
 }
-
-
-/*
-   Appendix A: HEP3 JSON Format (prototype)
-*/
-
-/*
-var hepPacket = {
-       "type": "HEP",
-       "version": 3,
-       "rcinfo": {
-         "protocolFamily": 2,
-         "protocol": 17,
-         "srcIp": "192.168.3.12",
-         "srcPort": 5060,
-         "dstIp": "192.168.3.11",
-         "dstPort": 5060,
-         "timestamp": "2015-06-11T12:36:08:222Z",
-         "timestampUSecs": 0,
-         "captureId": 241,
-	 "hepNodeName": "ams01-voip",
-         "capturePass": "myHep",
-         "payload_type": "SIP"
-       },
-       "payload": {
-           "data": "INVITE sip:9999@homer SIP/2.0\r\n..."
-       }
-   };
-
-*/
